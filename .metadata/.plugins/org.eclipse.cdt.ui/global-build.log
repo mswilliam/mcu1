@@ -1,0 +1,4 @@
+10:16:09 **** Clean-only build of configuration Debug for project 006_stm32f4xx_driver ****
+make -j4 clean 
+rm -rf *
+ 
