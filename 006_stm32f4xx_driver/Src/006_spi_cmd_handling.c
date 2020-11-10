@@ -54,7 +54,9 @@ void spi_send_led_read_cmd(void);
 void spi_send_print_cmd(void);
 void spi_send_id_read_cmd(void);
 
-handler_func_t gl_apfhandler_func [MAX_NUMBER_OF_HANDLER] = {spi_send_led_on_cmd, spi_send_sensor_read_cmd, spi_send_led_read_cmd, spi_send_print_cmd, spi_send_id_read_cmd};
+handler_func_t gl_apfhandler_func[MAX_NUMBER_OF_HANDLER] = {
+		spi_send_led_on_cmd, spi_send_sensor_read_cmd, spi_send_led_read_cmd,
+		spi_send_print_cmd, spi_send_id_read_cmd };
 
 int main() {
 	spi_gpio_init();
@@ -70,7 +72,8 @@ void EXTI0_IRQHandler(void) {
 	static uint8_t loc_su8current_handler = 0U;
 	gpio_irq_handling(GPIO_PIN_0);
 	gl_apfhandler_func[loc_su8current_handler]();
-	loc_su8current_handler = (loc_su8current_handler + 1) % MAX_NUMBER_OF_HANDLER;
+	loc_su8current_handler = (loc_su8current_handler + 1)
+			% MAX_NUMBER_OF_HANDLER;
 }
 
 uint8_t spi_verify_response(uint8_t arg_u8ack) {
@@ -114,7 +117,7 @@ void spi_send_sensor_read_cmd(void) {
 	spi_receive_data(SPI2, &loc_u8ack, sizeof(loc_u8ack));
 	if (spi_verify_response(loc_u8ack)) {
 		// send arguments
-		uint8_t loc_au8args[] = {ANALOG_PIN0};
+		uint8_t loc_au8args[] = { ANALOG_PIN0 };
 		spi_send_data(SPI2, loc_au8args, sizeof(loc_au8args));
 
 		/*!< do dummy read to clear off the RXNE*/
@@ -131,7 +134,7 @@ void spi_send_sensor_read_cmd(void) {
 	}
 
 	/*!< Let's confirm that spi is not busy*/
-	while (FLAG_SET == spi_get_flag_status(SPI2, SPI_BSY_FLAG))
+	while (FLAG_SET == spi_get_flag_status(SPI2, SPI_FLAG_BSY))
 		;
 	spi_control(SPI2, DISABLE);
 }
@@ -156,12 +159,12 @@ void spi_send_led_on_cmd(void) {
 	spi_receive_data(SPI2, &loc_u8ack, sizeof(loc_u8ack));
 	if (spi_verify_response(loc_u8ack)) {
 		// send arguments
-		uint8_t loc_au8args[] = {LED_PIN, LED_ON};
+		uint8_t loc_au8args[] = { LED_PIN, LED_ON };
 		spi_send_data(SPI2, loc_au8args, sizeof(loc_au8args));
 	}
 
 	/*!< Let's confirm that spi is not busy*/
-	while (FLAG_SET == spi_get_flag_status(SPI2, SPI_BSY_FLAG))
+	while (FLAG_SET == spi_get_flag_status(SPI2, SPI_FLAG_BSY))
 		;
 	spi_control(SPI2, DISABLE);
 }

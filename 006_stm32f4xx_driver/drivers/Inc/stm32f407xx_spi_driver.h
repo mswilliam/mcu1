@@ -145,10 +145,10 @@
 #define SPI_SSM_DI (0x0U)	/*!< 0: Software slave management disabled*/
 #define SPI_SSM_EN (0x1U)	/*!< 1: Software slave management enabled*/
 
-#define SPI_TX_EMPTY_FLAG	 	(SET << SPI_SR_TXE)
-#define SPI_RX_NOT_EMPTY_FLAG	(SET << SPI_SR_RXNE)
-#define SPI_BSY_FLAG		 	(SET << SPI_SR_BSY)
-#define SPI_ERROR_FLAG		 	(SET << SPI_SR_MODF | SPI_SR_OVR | SPI_SR_CRC | SPI_SR_FRE)
+#define SPI_FLAG_TX_EMPTY	 	(SET << SPI_SR_TXE)
+#define SPI_FLAG_RX_NOT_EMPTY	(SET << SPI_SR_RXNE)
+#define SPI_FLAG_BSY		 	(SET << SPI_SR_BSY)
+#define SPI_FLAG_ERROR		 	(SET << SPI_SR_MODF | SPI_SR_OVR | SPI_SR_CRC | SPI_SR_FRE)
 
 typedef struct {
 	uint16_t master_or_slave :1; /*!< possible values from @SPI_MSTR*/
@@ -416,7 +416,8 @@ void spi_irq_handling(spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler);
  *
  * @Note				- none
  */
-void spi_clear_ovr_flag(spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler);
+void spi_clear_ovr_flag(
+		spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler);
 
 /***************************************************************************************
  * @fn					- spi_close_transmission
@@ -429,8 +430,8 @@ void spi_clear_ovr_flag(spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler
  *
  * @Note				- none
  */
-void spi_close_transmission(spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler);
-
+void spi_close_transmission(
+		spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler);
 
 /***************************************************************************************
  * @fn					- spi_close_reception
@@ -443,7 +444,8 @@ void spi_close_transmission(spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_han
  *
  * @Note				- none
  */
-void spi_close_reception(spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler);
+void spi_close_reception(
+		spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler);
 
 /*
  * spi application callback

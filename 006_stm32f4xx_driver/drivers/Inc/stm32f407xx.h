@@ -306,6 +306,30 @@ typedef struct {
 	 This bit is cleared by programming it to ‘1’*/
 } exti_reg_t;
 
+/*
+ * Define the RCC_CFGR bit position
+ */
+#define RCC_CFGR_SW0		(0U)
+#define RCC_CFGR_SW1		(1U)
+#define RCC_CFGR_SWS0		(2U)
+#define RCC_CFGR_SWS1		(3U)
+#define RCC_CFGR_HPRE		(4U)
+#define RCC_CFGR_PPRE1		(10U)
+#define RCC_CFGR_PPRE2		(13U)
+#define RCC_CFGR_RTCPRE		(16U)
+#define RCC_CFGR_MCO1		(21U)
+#define RCC_CFGR_I2SSCR		(23U)
+#define RCC_CFGR_MCO1_PRE	(24U)
+#define RCC_CFGR_MCO2_PRE	(27U)
+#define RCC_CFGR_MCO2		(30U)
+
+/*
+ * Define the RCC_CFGR_SW value: System clock switch
+ */
+#define IS_HSI_SYSTEM_CLK	(0U)
+#define IS_HSE_SYSTEM_CLK	(1U)
+#define IS_PLL_SYSTEM_CLK	(2U)
+
 /*!< EXTI base addresses definition typecasted to exti_reg_t*/
 #define EXTI ((exti_reg_t *) EXTI_BASE_ADDR)
 
@@ -419,10 +443,13 @@ typedef struct {
  */
 
 typedef struct {
-	volatile uint32_t CR[2]; /* Control register Address offset: 0x00 Reset value: 0x0000 */
-	volatile uint32_t OAR[2]; /*  Own address register Address offset: 0x08 Reset value: 0x0000 */
+	volatile uint32_t CR1; /* Control register Address offset: 0x00 Reset value: 0x0000 */
+	volatile uint32_t CR2; /* Control register Address offset: 0x00 Reset value: 0x0000 */
+	volatile uint32_t OAR1; /*  Own address register Address offset: 0x08 Reset value: 0x0000 */
+	volatile uint32_t OAR2; /*  Own address register Address offset: 0x08 Reset value: 0x0000 */
 	volatile uint32_t DR; /* Data register Address offset: 0x10 Reset value: 0x0000 */
-	volatile uint32_t SR[2]; /* Status register Address offset: 0x14 Reset value: 0x0000 */
+	volatile uint32_t SR1; /* Status register Address offset: 0x14 Reset value: 0x0000 */
+	volatile uint32_t SR2; /* Status register Address offset: 0x14 Reset value: 0x0000 */
 	volatile uint32_t CCR; /* Clock control register Address offset: 0x1C Reset value: 0x0000 */
 	volatile uint32_t TRISE; /* Address offset: 0x20 Reset value: 0x0002 */
 } i2c_reg_t;
@@ -612,6 +639,19 @@ typedef struct {
 #define TWO_BIT		(0x03U)
 #define THREE_BIT 	(0x07U)
 #define FOUR_BIT 	(0x0FU)
+#define FIVE_BIT 	(0x1FU)
+#define SIX_BIT 	(0x3FU)
+#define SEVEN_BIT 	(0x7FU)
+#define EIGHT_BIT 	(0xFFU)
+#define NINE_BIT 	(0x1FFU)
+#define TEN_BIT 	(0x3FFU)
+#define ELEVEN_BIT 	(0x7FFU)
+#define TWELVEBIT 	(0xFFFU)
+
+#define SHIFT_ONE	(1U)
+#define SHIFT_TWO	(2U)
+#define SHIFT_THREE	(3U)
+#define SHIFT_FOUR	(4U)
 
 #define ENABLE 			(0x01U)
 #define DISABLE 		(0x00U)
@@ -624,6 +664,6 @@ typedef struct {
 
 #include "stm32f407xx_gpio_driver.h"
 #include "stm32f407xx_spi_driver.h"
-#include "stm32f407xx_spi_driver.h"
+#include "stm32f407xx_i2c_driver.h"
 
 #endif /* INC_STM32F407XX_H_ */

@@ -1,0 +1,36 @@
+/*
+ * 007_i2c_master_tx_testing.c
+ *
+ *  Created on: 5 nov. 2020
+ *      Author: msw
+ */
+
+
+#include "stm32f407xx.h"
+void delay(void);
+
+/*
+ * PB6 => SCL
+ * PB9 => SDA
+ */
+
+void i2c1_init() {
+	i2c_config_t loc_oi2c_config = {
+			I2C_SCL_SPEED_SM,
+			I2C_FM_DUTY_2,
+	0,
+	I2C_ACK_EN };
+	spi_handle_t loc_sspi2_handle = { SPI2, &loc_sspi_config };
+	spi_init(&loc_sspi2_handle);
+}
+
+int main() {
+	for (;;);
+	return 0;
+}
+
+
+void delay(void) {
+	for (uint32_t loc_u32index = 0; loc_u32index < 0xFFFFU; ++loc_u32index)
+		;
+}

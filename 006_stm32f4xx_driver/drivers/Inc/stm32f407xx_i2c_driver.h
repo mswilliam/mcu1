@@ -27,6 +27,11 @@
 #define I2C_CR1_ALERT		(13U)
 #define I2C_CR1_SWRST		(15U)
 
+/*!< Bit position definition for i2c CCR*/
+#define I2C_CCR_CCR		(0U)
+#define I2C_CCR_DUTY	(14U)
+#define I2C_CCR_FS		(15U)
+
 /*!< Bit position definition for i2c CR2*/
 #define I2C_CR2_FREQ	(0U)
 #define I2C_CR2_ITERREN	(8U)
@@ -34,6 +39,13 @@
 #define I2C_CR2_ITBUFEN	(10U)
 #define I2C_CR2_DMAEN	(11U)
 #define I2C_CR2_LAST	(12U)
+
+/*!< Bit position definition for i2c OAR1*/
+#define I2C_OAR1_ADD0		(0U)
+#define I2C_OAR1_ADD71		(1U)
+#define I2C_OAR1_ADD98		(8U)
+#define I2C_OAR1_RSV14		(14U)
+#define I2C_OAR1_ADDMODE	(15U)
 
 /*!< Bit position definition for i2c SR1*/
 #define I2C_SR1_SB			(0U)
@@ -61,12 +73,22 @@
 #define I2C_SR2_DUALF		(7U)
 #define I2C_SR2_PEC			(8U)
 
-/*!< Bit position definition for i2c CCR*/
-#define I2C_CCR_CCR		(0U)
-#define I2C_CCR_DUTY	(14U)
-#define I2C_CCR_FS		(15U)
+/*!< I2C FLAGs*/
 
+#define I2C_FLAG_SB			(SET << I2C_SR1_SB)
+#define I2C_FLAG_TXE		(SET << I2C_SR1_TxE)
+#define I2C_FLAG_RXNE		(SET << I2C_SR1_RxNE)
+#define I2C_FLAG_ADDR		(SET << I2C_SR1_ADDR)
+#define I2C_FLAG_BTF		(SET << I2C_SR1_BTF)
+#define I2C_FLAG_STOPF		(SET << I2C_SR1_STOPF)
+#define I2C_FLAG_BERR		(SET << I2C_SR1_BERR)
+#define I2C_FLAG_ARLO		(SET << I2C_SR1_ARLO)
+#define I2C_FLAG_AF			(SET << I2C_SR1_AF)
+#define I2C_FLAG_OVR		(SET << I2C_SR1_OVR)
+#define I2C_FLAG_TIMEOUT	(SET << I2C_SR1_TIMEOUT)
 
+#define I2C_REPEAT_START_NO		(0U)
+#define I2C_REPEAT_START_YES	(1U)
 /*
  * Configuration structure for I2C peripheral
  */
@@ -240,7 +262,7 @@ uint8_t i2c_get_flag_status(i2c_reg_t *arg_ptr_i2c, uint32_t arg_u8flag);
  *
  * @brief				- Send data to a data register
  *
- * @param[in]			- Base address of the i2c peripheral
+ * @param[in]			- structure containing the i2c and the information relate to the tranceiver
  * @param[in]			- Base address of the data to be sent
  * @param[in]			- size of the data to be sent
  *
@@ -248,15 +270,15 @@ uint8_t i2c_get_flag_status(i2c_reg_t *arg_ptr_i2c, uint32_t arg_u8flag);
  *
  * @Note				- This is a blocking call
  */
-void i2c_send_data(i2c_reg_t *arg_ptr_i2c, uint8_t *arg_ptr_u8tx_buffer,
-		uint32_t arg_u32len);
+void i2c_master_send_data(i2c_handle_t *arg_ptr_oi2c_handler,
+		uint8_t *arg_ptr_u8tx_buffer, uint32_t arg_u32len, uint8_t arg_u8slave_addr, uint8_t arg_u8repeated_start);
 
 /***************************************************************************************
  * @fn					- i2c_receive_data
  *
  * @brief				- Receive data from a data register
  *
- * @param[in]			- Base address of the i2c peripheral
+ * @param[in]			- structure containing the i2c and the information relate to the tranceiver
  * @param[in]			- Base address for the received data
  * @param[in]			- size of the data to be received
  *
@@ -264,8 +286,8 @@ void i2c_send_data(i2c_reg_t *arg_ptr_i2c, uint8_t *arg_ptr_u8tx_buffer,
  *
  * @Note				- This is a blocking call
  */
-void i2c_receive_data(i2c_reg_t *arg_ptr_i2c, uint8_t *arg_ptr_u8rx_buffer,
-		uint32_t arg_u32len);
+void i2c_master_receive_data(i2c_handle_t *arg_ptr_oi2c_handler,
+		uint8_t *arg_ptr_u8tx_buffer, uint32_t arg_u32len, uint8_t arg_u8slave_addr, uint8_t arg_u8repeated_start);
 
 /***************************************************************************************
  * @fn					- i2c_send_data
@@ -280,8 +302,7 @@ void i2c_receive_data(i2c_reg_t *arg_ptr_i2c, uint8_t *arg_ptr_u8rx_buffer,
  *
  * @Note				- This is a non blocking call
  */
-uint8_t i2c_send_data_ti(
-		i2c_handle_t *arg_ptr_oi2c_handler,
+uint8_t i2c_master_send_data_ti(i2c_handle_t *arg_ptr_oi2c_handler,
 		uint8_t *arg_ptr_u8tx_buffer, uint32_t arg_u32len);
 
 /***************************************************************************************
@@ -297,8 +318,7 @@ uint8_t i2c_send_data_ti(
  *
  * @Note				- This is a non blocking call
  */
-uint8_t i2c_receive_data_ti(
-		i2c_handle_t *arg_ptr_oi2c_handler,
+uint8_t i2c_master_receive_data_ti(i2c_handle_t *arg_ptr_oi2c_handler,
 		uint8_t *arg_ptr_u8rx_buffer, uint32_t arg_u32len);
 
 /*
@@ -317,7 +337,10 @@ uint8_t i2c_receive_data_ti(
  * i2c application callback
  */
 
-void i2c_application_event_callback(
-		i2c_handle_t *arg_ptr_oi2c_handler,
+void i2c_application_event_callback(i2c_handle_t *arg_ptr_oi2c_handler,
 		uint8_t arg_u8event);
+
+
+void i2c_manage_ack(i2c_reg_t *arg_poi2c_reg, uint8_t arg_u8en_or_di);
+
 #endif /* INC_STM32F407XX_I2C_DRIVER_H_ */

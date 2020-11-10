@@ -1,0 +1,19 @@
+/*
+ * 007_i2c_master_tx_testing.c
+ *
+ *  Created on: 5 nov. 2020
+ *      Author: msw
+ */
+
+
+#include "stm32f407xx.h"
+
+int main() {
+	spi_gpio_init();
+	spi2_init();
+	spi_soe_config(SPI2, ENABLE);
+	init_button();
+	for (;;)
+		;
+	return 0;
+}

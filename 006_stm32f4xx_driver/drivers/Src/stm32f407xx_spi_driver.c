@@ -209,7 +209,7 @@ void spi_send_data(spi_reg_t *arg_ptr_spi, uint8_t *arg_ptr_u8tx_buffer,
 		memcpy(&loc_u16data, arg_ptr_u8tx_buffer + loc_u32_len_transmitted,
 				(loc_u8data_len <= arg_u32len - loc_u32_len_transmitted ?
 						loc_u8data_len : arg_u32len - loc_u32_len_transmitted));
-		while (FLAG_RESET == spi_get_flag_status(arg_ptr_spi, SPI_TX_EMPTY_FLAG))
+		while (FLAG_RESET == spi_get_flag_status(arg_ptr_spi, SPI_FLAG_TX_EMPTY))
 			;
 		arg_ptr_spi->DR = loc_u16data;
 	}
@@ -228,7 +228,7 @@ void spi_receive_data(spi_reg_t *arg_ptr_spi, uint8_t *arg_ptr_u8rx_buffer,
 	for (uint32_t loc_u32_len_received = 0; loc_u32_len_received < arg_u32len;
 			loc_u32_len_received += loc_u8data_len) {
 		while (FLAG_RESET
-				== spi_get_flag_status(arg_ptr_spi, SPI_RX_NOT_EMPTY_FLAG))
+				== spi_get_flag_status(arg_ptr_spi, SPI_FLAG_RX_NOT_EMPTY))
 			;
 		loc_u16data = arg_ptr_spi->DR;
 
@@ -293,7 +293,7 @@ void spi_irq_handling(spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler) 
 					& (SET << SPI_CR2_RXNEIE));
 	uint8_t loc_u8is_trigerred_it = FLAG_SET
 			== spi_get_flag_status(arg_ptr_sspi_tranceiver_handler->ptr_sspi,
-			SPI_RX_NOT_EMPTY_FLAG);
+			SPI_FLAG_RX_NOT_EMPTY);
 
 	if (loc_u8is_expected_it && loc_u8is_trigerred_it) {
 		spi_irq_handling_rx(arg_ptr_sspi_tranceiver_handler);
@@ -304,7 +304,7 @@ void spi_irq_handling(spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler) 
 		loc_u8is_trigerred_it = FLAG_SET
 				== spi_get_flag_status(
 						arg_ptr_sspi_tranceiver_handler->ptr_sspi,
-						SPI_TX_EMPTY_FLAG);
+						SPI_FLAG_TX_EMPTY);
 		if (loc_u8is_expected_it && loc_u8is_trigerred_it) {
 			spi_irq_handling_tx(arg_ptr_sspi_tranceiver_handler);
 		} else {
@@ -314,7 +314,7 @@ void spi_irq_handling(spi_tranceiver_handle_t *arg_ptr_sspi_tranceiver_handler) 
 			loc_u8is_trigerred_it = FLAG_SET
 					== spi_get_flag_status(
 							arg_ptr_sspi_tranceiver_handler->ptr_sspi,
-							SPI_ERROR_FLAG);
+							SPI_FLAG_ERROR);
 
 			if (loc_u8is_expected_it && loc_u8is_trigerred_it) {
 
