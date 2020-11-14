@@ -76,6 +76,7 @@
 /*!< I2C FLAGs*/
 
 #define I2C_FLAG_SB			(SET << I2C_SR1_SB)
+#define I2C_FLAG_ADD10		(SET << I2C_SR1_ADD10)
 #define I2C_FLAG_TXE		(SET << I2C_SR1_TxE)
 #define I2C_FLAG_RXNE		(SET << I2C_SR1_RxNE)
 #define I2C_FLAG_ADDR		(SET << I2C_SR1_ADDR)
@@ -85,10 +86,27 @@
 #define I2C_FLAG_ARLO		(SET << I2C_SR1_ARLO)
 #define I2C_FLAG_AF			(SET << I2C_SR1_AF)
 #define I2C_FLAG_OVR		(SET << I2C_SR1_OVR)
+#define I2C_FLAG_PECERR		(SET << I2C_SR1_PECERR)
 #define I2C_FLAG_TIMEOUT	(SET << I2C_SR1_TIMEOUT)
+#define I2C_FLAG_SMBALERT	(SET << I2C_SR1_SMBALERT)
 
 #define I2C_REPEAT_START_NO		(0U)
 #define I2C_REPEAT_START_YES	(1U)
+
+/*
+ * I2C application events
+ */
+#define I2C_EV_TX_CMPLT		(0U)
+#define I2C_EV_RX_CMPLT		(1U)
+#define I2C_EV_STOP			(2U)
+#define I2C_ERROR_BERR		(3U)
+#define I2C_ERROR_ARLO		(4U)
+#define I2C_ERROR_AF		(5U)
+#define I2C_ERROR_OVR		(6U)
+#define I2C_ERROR_PECERR	(7U)
+#define I2C_ERROR_TIMEOUT	(8U)
+#define I2C_ERROR_SMBALERT	(9U)
+
 /*
  * Configuration structure for I2C peripheral
  */
@@ -103,9 +121,24 @@ typedef struct {
  * Handle structure for a GPIO pin
  */
 typedef struct {
-	i2c_reg_t *ptr_oi2c; /*!< base address of the i2c */
-	i2c_config_t *ptr_sconfig; /*!< i2c configuration setting */
+	i2c_reg_t *m_poi2c_reg; /*!< base address of the i2c >*/
+	i2c_config_t *m_poi2c_sconfig; /*!< i2c configuration setting >*/
+	uint8_t *m_pu8tx_buffer; /*!<  To store the app tx buffer addr >*/
+	uint8_t *m_pu8rx_buffer; /*!<  To store the app rx buffer addr >*/
+	uint32_t m_u32tx_len; /*!<  To store the tx len >*/
+	uint32_t m_u32rx_len; /*!<  To store the rx len  >*/
+	uint8_t m_u8rx_tx_state; /*!<  To store the comm state see @appState >*/
+	uint8_t m_u8dev_addr; /*!<  To store the slave/device address >*/
+	uint32_t m_u32rx_size; /*!<  To store the rx size >*/
+	uint8_t m_u8sr; /*!<  To store the repeated start value >*/
+
 } i2c_handle_t;
+/*
+ * @appState
+ */
+#define I2C_READY		(0U)
+#define I2C_BUSY_IN_RX	(1U)
+#define I2C_BUSY_IN_TX	(2U)
 
 /*
  * @fm_duty_cycle
@@ -182,6 +215,10 @@ void i2c_init(i2c_handle_t *arg_ptr_oi2c_handler);
 void i2c_irq_config(uint8_t arg_irq_number, uint8_t arg_irq_priority,
 		uint8_t arg_enable_or_disable);
 
+void i2c_ev_irq_handler(i2c_handle_t *arg_poi2c_handler);
+
+void i2c_er_irq_handler(i2c_handle_t *arg_poi2c_handler);
+
 /***************************************************************************************
  * @fn					- i2c_enable
  *
@@ -198,7 +235,7 @@ void i2c_irq_config(uint8_t arg_irq_number, uint8_t arg_irq_priority,
 void i2c_control(i2c_reg_t *arg_ptr_i2c, uint8_t arg_enable_or_disable);
 
 /***************************************************************************************
- * @fn					- i2c_enable
+ * @fn					- i2c_config
  *
  * @brief				- Enable or disable the ssi of the given i2c
  *
@@ -210,7 +247,13 @@ void i2c_control(i2c_reg_t *arg_ptr_i2c, uint8_t arg_enable_or_disable);
  *
  * @Note				- none
  */
-void i2c_ssi_config(i2c_reg_t *arg_ptr_i2c, uint8_t arg_enable_or_disable);
+void i2c_config(i2c_reg_t *arg_ptr_i2c, uint8_t arg_enable_or_disable);
+
+/*
+ * IéC application call back
+ */
+void i2c_app_callback(i2c_handle_t *arg_poi2c_handler, uint8_t arg_u8evt);
+
 
 /***************************************************************************************
  * @fn					- i2c_soe_config
@@ -290,7 +333,7 @@ void i2c_master_receive_data(i2c_handle_t *arg_ptr_oi2c_handler,
 		uint8_t *arg_ptr_u8tx_buffer, uint32_t arg_u32len, uint8_t arg_u8slave_addr, uint8_t arg_u8repeated_start);
 
 /***************************************************************************************
- * @fn					- i2c_send_data
+ * @fn					- i2c_master_send_data_it
  *
  * @brief				- Send data to a data register
  *
@@ -298,15 +341,16 @@ void i2c_master_receive_data(i2c_handle_t *arg_ptr_oi2c_handler,
  * @param[in]			- Base address of the data to be sent
  * @param[in]			- size of the data to be sent
  *
- * @return				- none
+ * @return				- application state see @appState
  *
  * @Note				- This is a non blocking call
  */
-uint8_t i2c_master_send_data_ti(i2c_handle_t *arg_ptr_oi2c_handler,
-		uint8_t *arg_ptr_u8tx_buffer, uint32_t arg_u32len);
+uint8_t i2c_master_send_data_it(i2c_handle_t *arg_poi2c_handler,
+		uint8_t *arg_pu8tx_buffer, uint32_t arg_u32len,
+		uint8_t arg_u8slave_addr, uint8_t arg_u8repeated_start);
 
 /***************************************************************************************
- * @fn					- i2c_receive_data
+ * @fn					- i2c_master_receive_data_it
  *
  * @brief				- Receive data from a data register
  *
@@ -314,12 +358,13 @@ uint8_t i2c_master_send_data_ti(i2c_handle_t *arg_ptr_oi2c_handler,
  * @param[in]			- Base address for the received data
  * @param[in]			- size of the data to be received
  *
- * @return				- none
+ * @return				- application state see @appState
  *
  * @Note				- This is a non blocking call
  */
-uint8_t i2c_master_receive_data_ti(i2c_handle_t *arg_ptr_oi2c_handler,
-		uint8_t *arg_ptr_u8rx_buffer, uint32_t arg_u32len);
+uint8_t i2c_master_receive_data_it(i2c_handle_t *arg_poi2c_handler,
+		uint8_t *arg_pu8rx_buffer, uint32_t arg_u32len,
+		uint8_t arg_u8slave_addr, uint8_t arg_u8repeated_start);
 
 /*
  * IRQ configuration & ISR handling
@@ -342,5 +387,10 @@ void i2c_application_event_callback(i2c_handle_t *arg_ptr_oi2c_handler,
 
 
 void i2c_manage_ack(i2c_reg_t *arg_poi2c_reg, uint8_t arg_u8en_or_di);
+
+
+void i2c_generate_stop_condition(i2c_reg_t *arg_poi2c_reg);
+void i2c_close_send_data(i2c_handle_t *arg_poi2c_handler);
+void i2c_close_receive_data(i2c_handle_t *arg_poi2c_handler);
 
 #endif /* INC_STM32F407XX_I2C_DRIVER_H_ */

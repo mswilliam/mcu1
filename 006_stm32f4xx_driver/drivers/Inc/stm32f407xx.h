@@ -468,6 +468,13 @@ typedef struct {
 #define I2C2_PCLK_DI() (RCC -> APB1ENR &= ~(1U << 22U))
 #define I2C3_PCLK_DI() (RCC -> APB1ENR &= ~(1U << 23U))
 
+/*!< I2C irq number definition*/
+#define I2C1_EV_IRQ_NUMBER	(31U) /*!< I2C1 event interrupt >*/
+#define I2C1_ER_IRQ_NUMBER	(32U) /*!< I2C1 error interrupt >*/
+#define I2C2_EV_IRQ_NUMBER	(33U) /*!< I2C2 event interrupt >*/
+#define I2C2_ER_IRQ_NUMBER	(34U) /*!< I2C2 error interrupt >*/
+#define I2C3_EVIRQ_NUMBER	(72U) /*!< I2C3 event interrupt >*/
+#define I2C3_ER_IRQ_NUMBER	(73U) /*!< I2C3 error interrupt >*/
 /*************************** Register definition structures for SPI*******************/
 /*
  * Peripheral register definition structures for SPI

@@ -1,7 +1,7 @@
-09:44:10 **** Clean-only build of configuration Debug for project 000_hello_world ****
+04:29:37 **** Clean-only build of configuration Debug for project 000_hello_world ****
 make -j4 clean 
 rm -rf *
  
 
-09:44:11 Build Finished. 0 errors, 0 warnings. (took 1s.360ms)
+04:29:38 Build Finished. 0 errors, 0 warnings. (took 231ms)
 
