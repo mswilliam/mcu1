@@ -106,6 +106,8 @@
 #define I2C_ERROR_PECERR	(7U)
 #define I2C_ERROR_TIMEOUT	(8U)
 #define I2C_ERROR_SMBALERT	(9U)
+#define I2C_EV_DATA_REQ		(10U)
+#define I2C_EV_DATA_RCV		(11U)
 
 /*
  * Configuration structure for I2C peripheral
@@ -219,6 +221,8 @@ void i2c_ev_irq_handler(i2c_handle_t *arg_poi2c_handler);
 
 void i2c_er_irq_handler(i2c_handle_t *arg_poi2c_handler);
 
+void i2c_irq_slave_manage_callback_events (i2c_reg_t *arg_ptr_i2c, uint8_t arg_enable_or_disable);
+
 /***************************************************************************************
  * @fn					- i2c_enable
  *
@@ -253,7 +257,6 @@ void i2c_config(i2c_reg_t *arg_ptr_i2c, uint8_t arg_enable_or_disable);
  * IéC application call back
  */
 void i2c_app_callback(i2c_handle_t *arg_poi2c_handler, uint8_t arg_u8evt);
-
 
 /***************************************************************************************
  * @fn					- i2c_soe_config
@@ -314,7 +317,8 @@ uint8_t i2c_get_flag_status(i2c_reg_t *arg_ptr_i2c, uint32_t arg_u8flag);
  * @Note				- This is a blocking call
  */
 void i2c_master_send_data(i2c_handle_t *arg_ptr_oi2c_handler,
-		uint8_t *arg_ptr_u8tx_buffer, uint32_t arg_u32len, uint8_t arg_u8slave_addr, uint8_t arg_u8repeated_start);
+		uint8_t *arg_ptr_u8tx_buffer, uint32_t arg_u32len,
+		uint8_t arg_u8slave_addr, uint8_t arg_u8repeated_start);
 
 /***************************************************************************************
  * @fn					- i2c_receive_data
@@ -330,7 +334,35 @@ void i2c_master_send_data(i2c_handle_t *arg_ptr_oi2c_handler,
  * @Note				- This is a blocking call
  */
 void i2c_master_receive_data(i2c_handle_t *arg_ptr_oi2c_handler,
-		uint8_t *arg_ptr_u8tx_buffer, uint32_t arg_u32len, uint8_t arg_u8slave_addr, uint8_t arg_u8repeated_start);
+		uint8_t *arg_ptr_u8tx_buffer, uint32_t arg_u32len,
+		uint8_t arg_u8slave_addr, uint8_t arg_u8repeated_start);
+
+/***************************************************************************************
+ * @fn					- i2c_slave_send_data
+ *
+ * @brief				- Send data to a data register
+ *
+ * @param[in]			- Base address of I2C
+ * @param[in]			- data to be send
+ *
+ * @return				- none
+ *
+ * @Note				- This is a blocking call
+ */
+void i2c_slave_send_data(i2c_reg_t *arg_poi2c_reg, uint8_t arg_u8data);
+
+/***************************************************************************************
+ * @fn					- i2c_slave_receive_data
+ *
+ * @brief				- Receive data from a data register
+ *
+ * @param[in]			- Base address of I2C
+ *
+ * @return				- data read
+ *
+ * @Note				- This is a blocking call
+ */
+uint8_t i2c_slave_receive_data(i2c_reg_t *arg_poi2c_reg);
 
 /***************************************************************************************
  * @fn					- i2c_master_send_data_it
@@ -382,12 +414,7 @@ uint8_t i2c_master_receive_data_it(i2c_handle_t *arg_poi2c_handler,
  * i2c application callback
  */
 
-void i2c_application_event_callback(i2c_handle_t *arg_ptr_oi2c_handler,
-		uint8_t arg_u8event);
-
-
 void i2c_manage_ack(i2c_reg_t *arg_poi2c_reg, uint8_t arg_u8en_or_di);
-
 
 void i2c_generate_stop_condition(i2c_reg_t *arg_poi2c_reg);
 void i2c_close_send_data(i2c_handle_t *arg_poi2c_handler);

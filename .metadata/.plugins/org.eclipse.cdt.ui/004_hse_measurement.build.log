@@ -1,7 +1,7 @@
-04:29:26 **** Clean-only build of configuration Debug for project 004_hse_measurement ****
+18:28:59 **** Clean-only build of configuration Debug for project 004_hse_measurement ****
 make -j4 clean 
 rm -rf *
  
 
-04:29:26 Build Finished. 0 errors, 0 warnings. (took 228ms)
+18:28:59 Build Finished. 0 errors, 0 warnings. (took 242ms)
 

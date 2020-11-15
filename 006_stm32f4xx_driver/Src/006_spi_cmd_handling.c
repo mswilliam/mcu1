@@ -44,7 +44,6 @@ uint8_t gl_u8exti0_priority = 0x5U;
 
 void spi_gpio_init();
 void spi2_init();
-void init_button();
 void delay(void);
 uint8_t spi_verify_response(uint8_t arg_u8ack);
 

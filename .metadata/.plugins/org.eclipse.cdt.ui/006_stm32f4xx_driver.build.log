@@ -1,7 +1,7 @@
-04:29:15 **** Clean-only build of configuration Debug for project 006_stm32f4xx_driver ****
+18:29:30 **** Clean-only build of configuration Debug for project 006_stm32f4xx_driver ****
 make -j4 clean 
 rm -rf *
  
 
-04:29:15 Build Finished. 0 errors, 0 warnings. (took 258ms)
+18:29:31 Build Finished. 0 errors, 0 warnings. (took 228ms)
 
