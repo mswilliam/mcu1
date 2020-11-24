@@ -11,8 +11,6 @@
 /*
  * Define helper functions
  */
-static uint32_t rcc_get_pll_output_clk();
-static uint32_t rcc_get_pclk1_value();
 static void i2c_generate_start_condition(i2c_reg_t *arg_poi2c_reg);
 static void i2c_clear_ADDR_flag(i2c_handle_t *arg_poi2c_handler);
 static void i2c_execute_addr_phase_write(i2c_reg_t *arg_poi2c_reg,
@@ -78,42 +76,6 @@ static void i2c_clear_ADDR_flag(i2c_handle_t *arg_poi2c_handler) {
 	}
 }
 
-static uint32_t rcc_get_pll_output_clk() {
-	uint32_t loc_u32pll_output_clk = 0U;
-	return loc_u32pll_output_clk;
-}
-
-static uint32_t rcc_get_pclk1_value() {
-	uint32_t loc_u32pclk1 = 0U;
-	uint8_t loc_u8clk_src = (uint8_t) ((RCC->CFGR >> RCC_CFGR_SW1) & TWO_BIT);
-	/*!< find the clock source*/
-	if (IS_HSE_SYSTEM_CLK == loc_u8clk_src) {
-		loc_u32pclk1 = 8000000U; // 8MHZ
-	} else if (IS_HSI_SYSTEM_CLK == loc_u8clk_src) {
-		loc_u32pclk1 = 16000000U; //16MHZ
-	} else if (IS_PLL_SYSTEM_CLK == loc_u8clk_src) {
-		loc_u32pclk1 = rcc_get_pll_output_clk();
-	}
-
-	uint8_t loc_u8AHB_prescaler = (uint8_t) ((RCC->CFGR >> RCC_CFGR_HPRE)
-			& FOUR_BIT);
-	if (loc_u8AHB_prescaler > 7U) {
-		uint16_t loc_au16AHBprescaler_div[] = { 2U, 4U, 8U, 16U, 64U, 128U,
-				256U, 512U };
-		loc_u32pclk1 /=
-				loc_au16AHBprescaler_div[loc_u8AHB_prescaler & THREE_BIT];
-	}
-
-	uint8_t loc_u8APB1_prescaler = (uint8_t) ((RCC->CFGR >> RCC_CFGR_PPRE1)
-			& THREE_BIT);
-	if (loc_u8APB1_prescaler > 3U) {
-		uint8_t loc_u8APB1_prescaler_div[] = { 2U, 4U, 8U, 16U };
-		loc_u32pclk1 /= loc_u8APB1_prescaler_div[loc_u8AHB_prescaler & TWO_BIT];
-	}
-
-	return loc_u32pclk1;
-}
-
 static void i2c_generate_start_condition(i2c_reg_t *arg_poi2c_reg) {
 	arg_poi2c_reg->CR1 |= (SET << I2C_CR1_START);
 }
@@ -141,7 +103,7 @@ static void i2c_master_handle_RXNE_interrupt(i2c_handle_t *arg_poi2c_handler) {
 		if (2U == arg_poi2c_handler->m_u32rx_len) {
 			/*!< Disable acking*/
 			i2c_manage_ack(arg_poi2c_handler->m_poi2c_reg,
-			I2C_ACK_DI);
+					I2C_ACK_DI);
 		}
 		*(arg_poi2c_handler->m_pu8rx_buffer) =
 				(uint8_t) arg_poi2c_handler->m_poi2c_reg->DR;
@@ -193,26 +155,26 @@ void i2c_peri_clock_control(i2c_reg_t *arg_ptr_i2c,
 		uint8_t arg_u8enable_or_disable) {
 	switch ((int32_t) arg_ptr_i2c) {
 	case (int32_t) I2C1:
-		if (ENABLE == arg_u8enable_or_disable) {
-			I2C1_PCLK_EN();
-		} else if (DISABLE == arg_u8enable_or_disable) {
-			I2C1_PCLK_DI();
-		}
-		break;
+			if (ENABLE == arg_u8enable_or_disable) {
+				I2C1_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				I2C1_PCLK_DI();
+			}
+	break;
 	case (int32_t) I2C2:
-		if (ENABLE == arg_u8enable_or_disable) {
-			I2C2_PCLK_EN();
-		} else if (DISABLE == arg_u8enable_or_disable) {
-			I2C2_PCLK_DI();
-		}
-		break;
+			if (ENABLE == arg_u8enable_or_disable) {
+				I2C2_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				I2C2_PCLK_DI();
+			}
+	break;
 	case (int32_t) I2C3:
-		if (ENABLE == arg_u8enable_or_disable) {
-			I2C3_PCLK_EN();
-		} else if (DISABLE == arg_u8enable_or_disable) {
-			I2C3_PCLK_DI();
-		}
-		break;
+			if (ENABLE == arg_u8enable_or_disable) {
+				I2C3_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				I2C3_PCLK_DI();
+			}
+	break;
 	default:
 		break;
 	}
@@ -221,14 +183,14 @@ void i2c_peri_clock_control(i2c_reg_t *arg_ptr_i2c,
 void i2c_de_init(i2c_reg_t *arg_ptr_i2c) {
 	switch ((uint32_t) arg_ptr_i2c) {
 	case (uint32_t) I2C1:
-		I2C1_RST();
-		break;
+			I2C1_RST();
+	break;
 	case (uint32_t) I2C2:
-		I2C2_RST();
-		break;
+			I2C2_RST();
+	break;
 	case (uint32_t) I2C3:
-		I2C3_RST();
-		break;
+			I2C3_RST();
+	break;
 	default:
 		break;
 	}
@@ -271,7 +233,7 @@ void i2c_ev_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle ADDR IRQ >*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_ADDR));
+					I2C_FLAG_ADDR));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
 		i2c_clear_ADDR_flag(arg_poi2c_handler);
 	}
@@ -279,7 +241,7 @@ void i2c_ev_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle ADD10 IRQ >*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_ADD10));
+					I2C_FLAG_ADD10));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
 
 	}
@@ -288,7 +250,7 @@ void i2c_ev_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	 * Only in slave mode>*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_STOPF));
+					I2C_FLAG_STOPF));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
 		/*!< Clear the STOPF i.e 1. read SR1 2. write to CR1 >*/
 		arg_poi2c_handler->m_poi2c_reg->CR1 |= 0x0000U;
@@ -299,12 +261,12 @@ void i2c_ev_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle BTF IRQ >*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_BTF));
+					I2C_FLAG_BTF));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
 		if (I2C_BUSY_IN_TX == arg_poi2c_handler->m_u8rx_tx_state) {
 			//make sure that TXE is also set
 			if (FLAG_SET == i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_TXE)) {
+					I2C_FLAG_TXE)) {
 				if (arg_poi2c_handler->m_u32tx_len <= 0U) {
 					/*!< generate the stop condition >*/
 					if (I2C_REPEAT_START_NO == arg_poi2c_handler->m_u8sr) {
@@ -327,7 +289,7 @@ void i2c_ev_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle TxE IRQ >*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_TXE));
+					I2C_FLAG_TXE));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened
 			&& loc_u8is_buffer_irq_expected) {
 		if ((arg_poi2c_handler->m_poi2c_reg->SR2 >> I2C_SR2_MSL) & SET) {
@@ -347,7 +309,7 @@ void i2c_ev_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle RxNE IRQ >*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_RXNE));
+					I2C_FLAG_RXNE));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened
 			&& loc_u8is_buffer_irq_expected) {
 		if ((arg_poi2c_handler->m_poi2c_reg->SR2 >> I2C_SR2_MSL) & SET) {
@@ -369,7 +331,7 @@ void i2c_er_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle BERR IRQ >*/
 	uint8_t loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_BERR));
+					I2C_FLAG_BERR));
 	uint8_t loc_u8is_irq_expected = ((arg_poi2c_handler->m_poi2c_reg->CR2
 			>> I2C_CR2_ITERREN) & SET);
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
@@ -386,7 +348,7 @@ void i2c_er_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle ARLO IRQ >*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_ARLO));
+					I2C_FLAG_ARLO));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
 		/*!< This is the arbitration lost error >*/
 
@@ -401,7 +363,7 @@ void i2c_er_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle AF IRQ : applicable only in master mode>*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_AF));
+					I2C_FLAG_AF));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
 		/*!< This is the ACK failure error >*/
 
@@ -416,7 +378,7 @@ void i2c_er_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle OVR IRQ >*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_OVR));
+					I2C_FLAG_OVR));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
 		/*!< This is the overrun/underrun error >*/
 
@@ -430,7 +392,7 @@ void i2c_er_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle PECERR IRQ >*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_PECERR));
+					I2C_FLAG_PECERR));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
 		/*!< This is the PEC Error in reception >*/
 
@@ -445,7 +407,7 @@ void i2c_er_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle TIMEOUT IRQ >*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_TIMEOUT));
+					I2C_FLAG_TIMEOUT));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
 		/*!< This is the time out error >*/
 
@@ -460,7 +422,7 @@ void i2c_er_irq_handler(i2c_handle_t *arg_poi2c_handler) {
 	/*!< Handle SMBALERT IRQ >*/
 	loc_u8is_irq_happened = (FLAG_SET
 			== i2c_get_flag_status(arg_poi2c_handler->m_poi2c_reg,
-			I2C_FLAG_SMBALERT));
+					I2C_FLAG_SMBALERT));
 	if (loc_u8is_irq_expected && loc_u8is_irq_happened) {
 		/*!< This is the SMBus alert error >*/
 
@@ -501,7 +463,7 @@ void i2c_init(i2c_handle_t *arg_ptr_oi2c_handler) {
 	/*!< Configure the mode (standard or fast)*/
 	/*!< Configure the speed of the SCL : FREQ field of CR2*/
 	arg_ptr_oi2c_handler->m_poi2c_reg->CR2 &= ~(SIX_BIT << I2C_CR2_FREQ);
-	arg_ptr_oi2c_handler->m_poi2c_reg->CR2 |= (uint8_t) ((rcc_get_pclk1_value()
+	arg_ptr_oi2c_handler->m_poi2c_reg->CR2 |= (uint8_t) ((rcc_get_pclk_value(APB1)
 			/ 1000000U) & (SIX_BIT));
 
 	/*!< Configure the device address mode (7 bits or 10 bits)*/
@@ -520,7 +482,7 @@ void i2c_init(i2c_handle_t *arg_ptr_oi2c_handler) {
 	uint16_t loc_u16ccr_value = 0U;
 	if (arg_ptr_oi2c_handler->m_poi2c_sconfig->scl_speed <= I2C_SCL_SPEED_SM) {
 		/*!< standard mode*/
-		loc_u16ccr_value = (uint16_t) (rcc_get_pclk1_value()
+		loc_u16ccr_value = (uint16_t) (rcc_get_pclk_value(APB1)
 				/ (2 * arg_ptr_oi2c_handler->m_poi2c_sconfig->scl_speed));
 	} else {
 		/*!< fast mode*/
@@ -528,12 +490,12 @@ void i2c_init(i2c_handle_t *arg_ptr_oi2c_handler) {
 		if (I2C_FM_DUTY_16_9
 				== arg_ptr_oi2c_handler->m_poi2c_sconfig->fm_duty_cycle) {
 			arg_ptr_oi2c_handler->m_poi2c_reg->CCR |= (SET << I2C_CCR_DUTY);
-			loc_u16ccr_value = (uint16_t) (rcc_get_pclk1_value()
+			loc_u16ccr_value = (uint16_t) (rcc_get_pclk_value(APB1)
 					/ (25 * arg_ptr_oi2c_handler->m_poi2c_sconfig->scl_speed));
 		} else if (I2C_FM_DUTY_2
 				== arg_ptr_oi2c_handler->m_poi2c_sconfig->fm_duty_cycle) {
 			arg_ptr_oi2c_handler->m_poi2c_reg->CCR &= ~(SET << I2C_CCR_DUTY);
-			loc_u16ccr_value = (uint16_t) (rcc_get_pclk1_value()
+			loc_u16ccr_value = (uint16_t) (rcc_get_pclk_value(APB1)
 					/ (3 * arg_ptr_oi2c_handler->m_poi2c_sconfig->scl_speed));
 		}
 	}
@@ -544,16 +506,16 @@ void i2c_init(i2c_handle_t *arg_ptr_oi2c_handler) {
 	uint8_t loc_u8trise = 1;
 	if (arg_ptr_oi2c_handler->m_poi2c_sconfig->scl_speed <= I2C_SCL_SPEED_SM) {
 		/*!< standard mode*/
-		loc_u8trise += (uint8_t) (rcc_get_pclk1_value() / RISE_FREQ_SM_MAX);
+		loc_u8trise += (uint8_t) (rcc_get_pclk_value(APB1) / RISE_FREQ_SM_MAX);
 	} else if (arg_ptr_oi2c_handler->m_poi2c_sconfig->scl_speed
 			<= I2C_SCL_SPEED_FM2K) {
 		/*!< fast mode*/
-		loc_u8trise += (uint8_t) (rcc_get_pclk1_value() / RISE_FREQ_FM_MAX);
+		loc_u8trise += (uint8_t) (rcc_get_pclk_value(APB1) / RISE_FREQ_FM_MAX);
 	} else if (arg_ptr_oi2c_handler->m_poi2c_sconfig->scl_speed
 			<= I2C_SCL_SPEED_FM4K) {
 		/*!< fast mode*/
 		loc_u8trise +=
-				(uint8_t) (rcc_get_pclk1_value() / RISE_FREQ_FM_PLUS_MAX);
+				(uint8_t) (rcc_get_pclk_value(APB1) / RISE_FREQ_FM_PLUS_MAX);
 	}
 	arg_ptr_oi2c_handler->m_poi2c_reg->TRISE &= ~(SIX_BIT);
 	arg_ptr_oi2c_handler->m_poi2c_reg->TRISE |= (loc_u8trise & SIX_BIT);
@@ -632,7 +594,7 @@ void i2c_master_send_data(i2c_handle_t *arg_ptr_oi2c_handler,
 	/*!< 2. Confirm that the start generation is completed by checking the SB flag in the SR1 reg
 	 * Note: Until SB is cleared SCL will be stretched (pulled to low)*/
 	while (FLAG_RESET == i2c_get_flag_status(arg_ptr_oi2c_handler->m_poi2c_reg,
-	I2C_FLAG_SB))
+			I2C_FLAG_SB))
 		;
 
 	/*!< 3. Send the address of slave with r/w bit set to w (0) (total 8 bits)*/
@@ -642,7 +604,7 @@ void i2c_master_send_data(i2c_handle_t *arg_ptr_oi2c_handler,
 
 	/*!< 4. Confirm that the address phase is completed by checking the ADDR flag in the SR1*/
 	while (FLAG_RESET == i2c_get_flag_status(arg_ptr_oi2c_handler->m_poi2c_reg,
-	I2C_FLAG_ADDR))
+			I2C_FLAG_ADDR))
 		;
 
 	/*!< 5. Clear the ADDR flag according to its software sequence
@@ -653,7 +615,7 @@ void i2c_master_send_data(i2c_handle_t *arg_ptr_oi2c_handler,
 	while (arg_u32len > 0) {
 		while (FLAG_RESET
 				== i2c_get_flag_status(arg_ptr_oi2c_handler->m_poi2c_reg,
-				I2C_FLAG_TXE))
+						I2C_FLAG_TXE))
 			;
 		arg_ptr_oi2c_handler->m_poi2c_reg->DR = *arg_ptr_u8tx_buffer;
 		++arg_ptr_u8tx_buffer;
@@ -664,10 +626,10 @@ void i2c_master_send_data(i2c_handle_t *arg_ptr_oi2c_handler,
 	 * Note: TXE = 1, BTF = 1, means both SR (shift reg) & DR (data reg) are empty and next transmission should begin
 	 * When BTF = 1 SCL will be stretched (pulled to LOW)*/
 	while (FLAG_RESET == i2c_get_flag_status(arg_ptr_oi2c_handler->m_poi2c_reg,
-	I2C_FLAG_TXE))
+			I2C_FLAG_TXE))
 		;
 	while (FLAG_RESET == i2c_get_flag_status(arg_ptr_oi2c_handler->m_poi2c_reg,
-	I2C_FLAG_BTF))
+			I2C_FLAG_BTF))
 		;
 
 	/*!< 8. Generate STOP condition and master need not to wait for the completion of stop condition.
@@ -686,7 +648,7 @@ void i2c_master_receive_data(i2c_handle_t *arg_ptr_oi2c_handler,
 	/*!< 2. Confirm that the start generation is completed by checking the SB flag in the SR1 reg
 	 * Note: Until SB is cleared SCL will be stretched (pulled to low)*/
 	while (FLAG_RESET == i2c_get_flag_status(arg_ptr_oi2c_handler->m_poi2c_reg,
-	I2C_FLAG_SB))
+			I2C_FLAG_SB))
 		;
 
 	/*!< 3. Send the address of slave with r/w bit set to r (1) (total 8 bits)*/
@@ -696,7 +658,7 @@ void i2c_master_receive_data(i2c_handle_t *arg_ptr_oi2c_handler,
 
 	/*!< 4. Confirm that the address phase is completed by checking the ADDR flag in the SR1*/
 	while (FLAG_RESET == i2c_get_flag_status(arg_ptr_oi2c_handler->m_poi2c_reg,
-	I2C_FLAG_ADDR))
+			I2C_FLAG_ADDR))
 		;
 
 	if (arg_u32len <= 1U) {
@@ -709,7 +671,7 @@ void i2c_master_receive_data(i2c_handle_t *arg_ptr_oi2c_handler,
 		/*!< 7. wait until RXNEbecomes 1*/
 		while (FLAG_RESET
 				== i2c_get_flag_status(arg_ptr_oi2c_handler->m_poi2c_reg,
-				I2C_FLAG_RXNE))
+						I2C_FLAG_RXNE))
 			;
 
 		/*!< 8. generate STOP condition*/

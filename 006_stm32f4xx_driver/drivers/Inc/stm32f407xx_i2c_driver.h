@@ -254,7 +254,7 @@ void i2c_control(i2c_reg_t *arg_ptr_i2c, uint8_t arg_enable_or_disable);
 void i2c_config(i2c_reg_t *arg_ptr_i2c, uint8_t arg_enable_or_disable);
 
 /*
- * IéC application call back
+ * I2C application call back
  */
 void i2c_app_callback(i2c_handle_t *arg_poi2c_handler, uint8_t arg_u8evt);
 

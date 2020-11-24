@@ -1,0 +1,377 @@
+/*
+ * stm32f407xx_usart_driver.c
+ *
+ *  Created on: 16 nov. 2020
+ *      Author: msw
+ */
+
+#include "stm32f407xx_usart_driver.h"
+
+static uint32_t rcc_get_pll_output_clk();
+static uint32_t rcc_get_pclk1_value();
+
+static uint32_t rcc_get_pll_output_clk() {
+	uint32_t loc_u32pll_output_clk = 0U;
+	return loc_u32pll_output_clk;
+}
+
+static uint32_t rcc_get_pclk1_value() {
+	uint32_t loc_u32pclk1 = 0U;
+	uint8_t loc_u8clk_src = (uint8_t) ((RCC->CFGR >> RCC_CFGR_SW1) & TWO_BIT);
+	/*!< find the clock source*/
+	if (IS_HSE_SYSTEM_CLK == loc_u8clk_src) {
+		loc_u32pclk1 = 8000000U; // 8MHZ
+	} else if (IS_HSI_SYSTEM_CLK == loc_u8clk_src) {
+		loc_u32pclk1 = 16000000U; //16MHZ
+	} else if (IS_PLL_SYSTEM_CLK == loc_u8clk_src) {
+		loc_u32pclk1 = rcc_get_pll_output_clk();
+	}
+
+	uint8_t loc_u8AHB_prescaler = (uint8_t) ((RCC->CFGR >> RCC_CFGR_HPRE)
+			& FOUR_BIT);
+	if (loc_u8AHB_prescaler > 7U) {
+		uint16_t loc_au16AHBprescaler_div[] = { 2U, 4U, 8U, 16U, 64U, 128U,
+				256U, 512U };
+		loc_u32pclk1 /=
+				loc_au16AHBprescaler_div[loc_u8AHB_prescaler & THREE_BIT];
+	}
+
+	uint8_t loc_u8APB1_prescaler = (uint8_t) ((RCC->CFGR >> RCC_CFGR_PPRE1)
+			& THREE_BIT);
+	if (loc_u8APB1_prescaler > 3U) {
+		uint8_t loc_u8APB1_prescaler_div[] = { 2U, 4U, 8U, 16U };
+		loc_u32pclk1 /= loc_u8APB1_prescaler_div[loc_u8AHB_prescaler & TWO_BIT];
+	}
+
+	return loc_u32pclk1;
+}
+
+void usart_control_peripheral(usart_reg_t *arg_ptr_usart, uint8_t arg_u8enable_or_disable) {
+	if (ENABLE == arg_u8enable_or_disable) {
+		arg_ptr_usart->CR1 |= (SET << USART_CR1_UE);
+	} else if (DISABLE == arg_u8enable_or_disable) {
+		arg_ptr_usart->CR1 &= ~(SET << USART_CR1_UE);
+	}
+}
+
+void usart_control_clock(usart_reg_t *arg_ptr_usart,
+		uint8_t arg_u8enable_or_disable) {
+	switch ((int32_t) arg_ptr_usart) {
+	case (int32_t) USART1:
+			if (ENABLE == arg_u8enable_or_disable) {
+				USART1_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				USART1_PCLK_DI();
+			}
+	break;
+	case (int32_t) USART2:
+			if (ENABLE == arg_u8enable_or_disable) {
+				USART2_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				USART2_PCLK_DI();
+			}
+	break;
+	case (int32_t) USART3:
+			if (ENABLE == arg_u8enable_or_disable) {
+				USART3_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				USART3_PCLK_DI();
+			}
+	break;
+	case (int32_t) UART4:
+			if (ENABLE == arg_u8enable_or_disable) {
+				UART4_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				UART4_PCLK_DI();
+			}
+	break;
+	case (int32_t) UART5:
+			if (ENABLE == arg_u8enable_or_disable) {
+				UART5_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				UART5_PCLK_DI();
+			}
+	break;
+	case (int32_t) USART6:
+			if (ENABLE == arg_u8enable_or_disable) {
+				USART6_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				USART6_PCLK_DI();
+			}
+	break;
+	case (int32_t) UART7:
+			if (ENABLE == arg_u8enable_or_disable) {
+				UART7_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				UART7_PCLK_DI();
+			}
+	break;
+	case (int32_t) UART8:
+			if (ENABLE == arg_u8enable_or_disable) {
+				UART8_PCLK_EN();
+			} else if (DISABLE == arg_u8enable_or_disable) {
+				UART8_PCLK_DI();
+			}
+	break;
+	default:
+		break;
+	}
+}
+
+uint8_t usart_get_flag_status(usart_reg_t *arg_ptr_usart, uint32_t arg_u8flag) {
+	uint8_t loc_u8flag = 0;
+	if (arg_ptr_usart->SR & arg_u8flag) {
+		loc_u8flag = FLAG_SET;
+	} else {
+		loc_u8flag = FLAG_RESET;
+	}
+	return loc_u8flag;
+}
+
+void usart_clear_flag_status(usart_reg_t *arg_ptr_usart, uint32_t arg_u32flag) {
+	switch (arg_u32flag) {
+	case USART_FLAG_CTS:
+	case USART_FLAG_LBD:
+	{
+		arg_ptr_usart->SR &= ~arg_u32flag;
+	}
+
+	break;
+	case USART_FLAG_TXE:
+	{
+		arg_ptr_usart->DR |= 0xFFFF;
+	}
+	break;
+	case USART_FLAG_TC:
+	{
+		uint32_t loc_u32dummy_read = arg_ptr_usart->SR;
+		arg_ptr_usart->DR &= 0xFFFF;
+		(void) loc_u32dummy_read;
+	}
+	break;
+	case USART_FLAG_RXNE:
+	{
+		uint32_t loc_u32dummy_read = arg_ptr_usart->SR;
+		(void) loc_u32dummy_read;
+	}
+	break;
+	case USART_FLAG_IDLE:
+	case USART_FLAG_ORE:
+	case USART_FLAG_NF:
+	case USART_FLAG_FE:
+	case USART_FLAG_PE:
+	{
+		uint32_t loc_u32dummy_read = arg_ptr_usart->SR;
+		loc_u32dummy_read = arg_ptr_usart->DR;
+		(void) loc_u32dummy_read;
+	}
+	break;
+	default:
+		break;
+	}
+}
+
+void usart_irq_config(uint8_t arg_irq_number, uint8_t arg_irq_priority,
+		uint8_t arg_enable_or_disable) {
+	uint8_t loc_u8nvic_iser_index = arg_irq_number / 32U;
+	uint8_t loc_u8nvic_iser_shift = arg_irq_number % 32U;
+	if (ENABLE == arg_enable_or_disable) {
+		NVIC_ISER[loc_u8nvic_iser_index] |= (SET << loc_u8nvic_iser_shift);
+		uint8_t loc_u8nvic_iser_ipr_index = arg_irq_number / 4U;
+		uint8_t loc_u8nvic_ipr_shift = (arg_irq_number % 4U) * 8U + 4U;
+		NVIC_IPR[loc_u8nvic_iser_ipr_index] |= (arg_irq_priority
+				<< loc_u8nvic_ipr_shift);
+	} else if (DISABLE == arg_enable_or_disable) {
+		NVIC_ICER[loc_u8nvic_iser_index] |= (SET << loc_u8nvic_iser_shift);
+	}
+}
+
+void usart_init(usart_handle_t *arg_pousart_handler) {
+	uint32_t loc_u32temp_reg = 0U;
+	/*!< ****************************** CR1 REG ****************************** >*/
+	/*!< enable the clock for the given uart >*/
+	usart_control_clock(arg_pousart_handler->m_poi2c_reg, ENABLE);
+
+	/*!< Enable Tx & Rx engin according to the usart_mode configuration >*/
+	if (USART_MODE_RX == arg_pousart_handler->m_pousart_config_t->m_u8mode) {
+		loc_u32temp_reg |= (SET << USART_CR1_RE);
+	} else if (USART_MODE_TX == arg_pousart_handler->m_pousart_config_t->m_u8mode) {
+		loc_u32temp_reg |= (SET << USART_CR1_TE);
+	} else if (USART_MODE_TXRX== arg_pousart_handler->m_pousart_config_t->m_u8mode) {
+		loc_u32temp_reg |= ((SET << USART_CR1_RE) | (SET << USART_CR1_TE));
+	}
+
+	/*!< configure the word length >*/
+	loc_u32temp_reg |= (arg_pousart_handler->m_pousart_config_t->m_u8word_length << USART_CR1_M);
+
+	/*!< Parity control bit >*/
+	if (arg_pousart_handler->m_pousart_config_t->m_u8parity_control != USART_PARITY_DI) {
+		loc_u32temp_reg |= (SET >> USART_CR1_PCE);
+		if(USART_PARITY_ODD == arg_pousart_handler->m_pousart_config_t->m_u8parity_control) {
+			loc_u32temp_reg |= (SET << USART_CR1_PS);
+		}
+	}
+
+	arg_pousart_handler->m_poi2c_reg->CR1 = loc_u32temp_reg;
+
+	/*!< ****************************** CR2 REG ****************************** >*/
+	loc_u32temp_reg = 0U;
+	/*!< number of stop bit >*/
+	loc_u32temp_reg |= (arg_pousart_handler->m_pousart_config_t->m_u8nomber_of_stop_bit << USART_CR2_STOP);
+
+	arg_pousart_handler->m_poi2c_reg->CR2 = loc_u32temp_reg;
+
+	/*!< ****************************** CR3 REG ****************************** >*/
+	loc_u32temp_reg = 0U;
+	/*!< Hw flow control >*/
+	if (USART_HW_FLWO_CTRL_CTS == arg_pousart_handler->m_pousart_config_t->m_u8hw_flow_control) {
+		loc_u32temp_reg |= (SET << USART_CR3_CTSE);
+	} else if (USART_HW_FLWO_CTRL_RTS == arg_pousart_handler->m_pousart_config_t->m_u8hw_flow_control) {
+		loc_u32temp_reg |= (SET << USART_CR3_RTSE);
+	} else if (USART_HW_FLWO_CTRL_CTS_RTS == arg_pousart_handler->m_pousart_config_t->m_u8hw_flow_control) {
+		loc_u32temp_reg |= ((SET << USART_CR3_CTSE) | (SET << USART_CR3_RTSE));
+	}
+
+	arg_pousart_handler->m_poi2c_reg->CR3 = loc_u32temp_reg;
+
+	/*!< Implement  >*/
+
+}
+
+void usart_de_init(usart_reg_t *arg_pusart) {
+	switch ((uint32_t) arg_pusart) {
+	case (uint32_t) USART1:
+			USART1_RST();
+	break;
+	case (uint32_t) USART2:
+			USART2_RST();
+	break;
+	case (uint32_t) USART3:
+			USART3_RST();
+	break;
+	case (uint32_t) UART4:
+			UART4_RST();
+	break;
+	case (uint32_t) UART5:
+			UART5_RST();
+	break;
+	case (uint32_t) USART6:
+			USART6_RST();
+	break;
+	case (uint32_t) UART7:
+			UART7_RST();
+	break;
+	case (uint32_t) UART8:
+			UART8_RST();
+	break;
+	default:
+		break;
+	}
+}
+
+void usart_send_data(usart_handle_t *arg_pusart_handle,
+		uint8_t *arg_pu8tx_buffer, uint32_t arg_u32len) {
+	/*!< loop over until arg_u32len number of byte is transferred >*/
+	for (uint32_t loc_u32bit_transferd = 0; loc_u32bit_transferd < arg_u32len; ++ loc_u32bit_transferd) {
+		/*!< Wait until TXE FLAG is set in SR >*/
+		while (FLAG_RESET == usart_get_flag_status(arg_pusart_handle->m_poi2c_reg, USART_FLAG_TXE));
+
+		/*!< Check word length item for 9bits or 8bits in a frame >*/
+		if (USART_WORD_LEN_9BITS == arg_pusart_handle->m_pousart_config_t->m_u8word_length) {
+			uint16_t *loc_pu16data = (uint16_t*)arg_pu8tx_buffer;
+			arg_pusart->DR = (*loc_pu16data & (uint16_t) NINE_BIT);
+
+			/*!< Check for parity >*/
+			if (USART_PARITY_DI== arg_pusart_handle->m_pousart_config_t->m_u8parity_control) {
+				/*!< No parity is used,so 9 bits of user data will be sent. Increment tx buffer twice >*/
+				arg_pu8tx_buffer += 2U;
+			} else {
+				/*!< Parity bit is used, so 8 bits of user data will be sent.
+				 * The 9th bit will be replace automatically by parity bit by the hardware >*/
+				++arg_pu8tx_buffer;
+			}
+		} else {
+			/*!< This is 8 bits transmission, load the DR with 1 byte of data >*/
+			arg_pusart->DR = (*arg_pu8tx_buffer & (uint8_t)EIGHT_BIT);
+			++arg_pu8tx_buffer;
+		}
+	}
+
+	/*!< Wait until TC FLAG is set in SR >*/
+	while (FLAG_RESET == usart_get_flag_status(arg_pusart, USART_FLAG_TC));
+}
+
+void usart_set_baud_rate(usart_reg_t *arg_pusart,
+		uint8_t arg_u8baud_rate) {
+	/*!< variable to hold the APB clock >*/
+	uint32_t loc_u32pclk = 0U;
+	uint32_t loc_u32usart_div = 0U;
+
+	/*!< variable to hold the mantissa and the fraction values >*/
+	uint32_t loc_u32mantissa = 0U;
+	uint32_t loc_u32fraction = 0U;
+
+	uint32_t loc_u32temp_reg = 0U;
+
+	/*!< Get the APB bus CLK  >*/
+	if(USART1 == arg_pusart || USART6 == arg_pusart) {
+		/*!< USART1 and USART6 are hanging on APB2 bus >*/
+		loc_u32pclk = rcc_get_pclk1_value();
+	} else {
+		loc_u32pclk = rcc_get_pclk1_value();
+	}
+
+	/*!< Check for OVER8 config bit  >*/
+	if(arg_pusart->CR1 & (SET << USART_CR1_OVER8)) {
+		/*!< Over sampling by 8  >*/
+		loc_u32usart_div = ((25U * loc_u32pclk) / (2U * arg_u8baud_rate));
+	} else {
+		/*!< Over sampling by 16  >*/
+		loc_u32usart_div = ((25U * loc_u32pclk) / (4U * arg_u8baud_rate));
+	}
+
+	/*!< Calculate the mantissa part >*/
+	loc_u32mantissa = loc_u32usart_div / 100U;
+}
+
+void usart_receive_data(usart_reg_t *arg_pusart,
+		uint8_t *arg_pu8rx_buffer, uint32_t arg_u32len) {
+	/*!< loop over until arg_u32len number of byte is received >*/
+	for (uint32_t loc_u32bit_received = 0; loc_u32bit_received < arg_u32len; ++ loc_u32bit_received) {
+		/*!< Wait until RXNE flag is set >*/
+		while(FLAG_RESET == usart_get_flag_status(arg_pusart, USART_FLAG_RXNE));
+
+		/*!< read 1 byte of data from DR >*/
+		*arg_pu8rx_buffer = arg_pusart->DR;
+		++arg_pu8rx_buffer;
+	}
+}
+
+uint8_t usart_send_data_it(usart_handle_t *arg_pusart_handle,
+		uint8_t *arg_pu8tx_buffer, uint32_t arg_u32len) {
+	uint8_t loc_u8tx_state = arg_pusart_handle->m_u8rx_tx_state;
+	if (loc_u8tx_state != USART_BUSY_IN_TX) {
+		arg_pusart_handle->m_pu8tx_buffer = arg_pu8tx_buffer;
+		arg_pusart_handle->m_u32tx_len = arg_u32len;
+		arg_pusart_handle->m_u8rx_tx_state = USART_BUSY_IN_TX;
+
+		/*!< Enable interrupt for TXE & TC>*/
+		arg_pusart_handle->m_poi2c_reg->CR1 |= ((SET << USART_CR1_TXEIE) | (SET << USART_CR1_TCIE));
+	}
+	return loc_u8tx_state;
+}
+
+uint8_t usart_receive_data_it(usart_handle_t *arg_pusart_handle,
+		uint8_t *arg_pu8rx_buffer, uint32_t arg_u32len) {
+	uint8_t loc_u8tx_state = arg_pusart_handle->m_u8rx_tx_state;
+	if (loc_u8tx_state != USART_BUSY_IN_RX) {
+		arg_pusart_handle->m_pu8rx_buffer = arg_pu8rx_buffer;
+		arg_pusart_handle->m_u32rx_len = arg_u32len;
+		arg_pusart_handle->m_u32rx_size= arg_u32len;
+		arg_pusart_handle->m_u8rx_tx_state = USART_BUSY_IN_RX;
+
+		/*!< Enable interrupt for RXNE & TC>*/
+		arg_pusart_handle->m_poi2c_reg->CR1 |= ((SET << USART_CR1_RXNEIE) | (SET << USART_CR1_TCIE));
+	}
+	return loc_u8tx_state;
+}

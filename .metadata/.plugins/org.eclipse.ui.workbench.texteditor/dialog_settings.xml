@@ -1,34 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="i2c_app_callback"/>
-		<item key="wrap" value="true"/>
+		<item key="selection" value="rcc_get_pclk_value(APB1)"/>
+		<item key="wrap" value="false"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="i2c_app_callback"/>
-			<item value="i2c_app_callback(arg_poi2c_handler"/>
-			<item value="i2c_app_callback(arg_poi2c_handler, I2C_EV_"/>
-			<item value="i2c_application_event_callback"/>
-			<item value="|="/>
-			<item value="&amp;="/>
-			<item value=" &amp; "/>
-			<item value="&amp;"/>
-			<item value="loc_u8is_irq_happened"/>
-			<item value="loc_u8is_irq_expected"/>
-			<item value="irq"/>
-			<item value="i2c_irq_config"/>
-			<item value="I2C"/>
-			<item value="gl_u8exti0_priority"/>
+			<item value="rcc_get_pclk1_value()"/>
+			<item value="@usart_word_length"/>
+			<item value="size"/>
+			<item value="spi_tranceiver_handle_t"/>
+			<item value="spi_tranceiver_t"/>
+			<item value="BUSY"/>
+			<item value="@usart_hw_flow_ctrl"/>
+			<item value="@usart_numb_stop_bits "/>
+			<item value="@usart_parity"/>
+			<item value="@usart_mode"/>
+			<item value="EARLYBF2020 "/>
+			<item value="usart_get_flag_status"/>
+			<item value="UART"/>
+			<item value="USART"/>
+			<item value="init"/>
 		</list>
 		<list key="replacehistory">
+			<item value="rcc_get_pclk_value(APB1)"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1454"/>
-		<item key="DIALOG_Y_ORIGIN" value="267"/>
+		<item key="DIALOG_X_ORIGIN" value="579"/>
+		<item key="DIALOG_Y_ORIGIN" value="81"/>
 		<item key="DIALOG_WIDTH" value="336"/>
 		<item key="DIALOG_HEIGHT" value="454"/>
 		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>

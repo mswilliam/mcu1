@@ -1,0 +1,391 @@
+/*
+ * stm32f407xx_usart_driver.h
+ *
+ *  Created on: 16 nov. 2020
+ *      Author: msw
+ */
+
+#ifndef INC_STM32F407XX_USART_DRIVER_H_
+#define INC_STM32F407XX_USART_DRIVER_H_
+
+#include "stm32f407xx.h"
+
+/*************************** Bit position definition for usart peripheral driver *******************/
+/*!< Bit position definition of
+ * Status register (USART_SR)
+ * >*/
+#define USART_SR_PE		(0U)
+#define USART_SR_FE		(1U)
+#define USART_SR_NF		(2U)
+#define USART_SR_ORE	(3U)
+#define USART_SR_IDLE	(4U)
+#define USART_SR_RXNE	(5U)
+#define USART_SR_TC		(6U)
+#define USART_SR_TXE	(7U)
+#define USART_SR_LBD	(8U)
+#define USART_SR_CTS	(9U)
+
+/*!< Bit position definition of
+ * Baud rate register (USART_BRR)
+ * >*/
+#define USART_BRR_DIV_FRACTION	(0U)
+#define USART_BRR_DIV_MANTISSA	(4U)
+
+/*!< Bit position definition of
+ * Control register 1 (USART_CR1)
+ * >*/
+#define USART_CR1_SBK		(0U)
+#define USART_CR1_RWU		(1U)
+#define USART_CR1_RE		(2U)
+#define USART_CR1_TE		(3U)
+#define USART_CR1_IDLEIE	(4U)
+#define USART_CR1_RXNEIE	(5U)
+#define USART_CR1_TCIE		(6U)
+#define USART_CR1_TXEIE		(7U)
+#define USART_CR1_PEIE		(8U)
+#define USART_CR1_PS		(9U)
+#define USART_CR1_PCE		(10U)
+#define USART_CR1_WAKE		(11U)
+#define USART_CR1_M			(12U)
+#define USART_CR1_UE		(13U)
+#define USART_CR1_OVER8		(15U)
+
+/*!< Bit position definition of
+ * Control register 2 (USART_CR2)
+ * >*/
+#define USART_CR2_ADD	(0U)
+#define USART_CR2_LBDL	(5U)
+#define USART_CR2_LBDIE	(6U)
+#define USART_CR2_LBCL	(8U)
+#define USART_CR2_CPHA	(9U)
+#define USART_CR2_CPOL	(10U)
+#define USART_CR2_CLKEN	(11U)
+#define USART_CR2_STOP	(12U)
+#define USART_CR2_LINEN	(14U)
+
+/*!< Bit position definition of
+ * Control register 3 (USART_CR3)
+ * >*/
+#define USART_CR3_EIE	(0U)
+#define USART_CR3_IREN	(1U)
+#define USART_CR3_IRLP	(2U)
+#define USART_CR3_HDSEL	(3U)
+#define USART_CR3_NACK	(4U)
+#define USART_CR3_SCEN	(5U)
+#define USART_CR3_DMAR	(6U)
+#define USART_CR3_DMAT	(7U)
+#define USART_CR3_RTSE	(8U)
+#define USART_CR3_CTSE	(9U)
+#define USART_CR3_CTSIE	(10U)
+#define USART_CR3_ONEBI	(11U)
+
+/*!< usart FLAGs*/
+#define USART_FLAG_TXE	(SET << USART_SR_TXE)
+#define USART_FLAG_CTS	(SET << USART_SR_CTS)
+#define USART_FLAG_TC	(SET << USART_SR_TC)
+#define USART_FLAG_RXNE	(SET << USART_SR_RXNE)
+#define USART_FLAG_ORE	(SET << USART_SR_ORE)
+#define USART_FLAG_IDLE	(SET << USART_SR_IDLE)
+#define USART_FLAG_PE	(SET << USART_SR_PE)
+#define USART_FLAG_LBD	(SET << USART_SR_LBD)
+#define USART_FLAG_NF	(SET << USART_SR_NF)
+#define USART_FLAG_ORE	(SET << USART_SR_ORE)
+#define USART_FLAG_FE	(SET << USART_SR_FE)
+
+/*
+ * @usart_mode
+ * possible options for usart mode
+ */
+#define USART_MODE_TX	(0U)
+#define USART_MODE_RX	(1U)
+#define USART_MODE_TXRX	(2U)
+
+
+/*
+ * @usart_numb_stop_bits
+ * possible options for usart number of stop bits
+ */
+#define USART_STOP_BITS_1	(0U)
+#define USART_STOP_BITS_0_5	(1U)
+#define USART_STOP_BITS_2	(2U)
+#define USART_STOP_BITS_1_5	(3U)
+
+/*
+ * @usart_baud
+ * possible options for usart baud
+ */
+#define USART_STD_BAUD_1200		(1200U)
+#define USART_STD_BAUD_2400		(2400U)
+#define USART_STD_BAUD_9600		(9600U)
+#define USART_STD_BAUD_38400	(38400U)
+#define USART_STD_BAUD_57600	(57600U)
+#define USART_STD_BAUD_115200	(115200U)
+#define USART_STD_BAUD_230400	(230400U)
+#define USART_STD_BAUD_460800	(460800U)
+#define USART_STD_BAUD_921600	(921600U)
+#define USART_STD_BAUD_2M		(2000000U)
+#define USART_STD_BAUD_3M		(3000000U)
+
+/*
+ * @usart_parity
+ * possible options for usart parity
+ */
+#define USART_PARITY_DI		(0U)
+#define USART_PARITY_ODD	(1U)
+#define USART_PARITY_EVEN	(2U)
+
+/*
+ * @usart_word_length
+ * possible options for usart word length
+ */
+#define USART_WORD_LEN_8BITS	(0U)
+#define USART_WORD_LEN_9BITS	(1U)
+
+/*
+ * @usart_hw_flow_ctrl
+ * possible options for usart hardware flow control
+ */
+#define USART_HW_FLWO_CTRL_NONE		(0U)
+#define USART_HW_FLWO_CTRL_CTS		(1U)
+#define USART_HW_FLWO_CTRL_RTS		(2U)
+#define USART_HW_FLWO_CTRL_CTS_RTS	(3U)
+
+
+/*
+ * @tx_rx_state
+ * possible tx rx state of usart
+ */
+#define USART_STATE_IDLE		(0U)
+#define USART_BUSY_IN_TX		(1U)
+#define USART_BUSY_IN_RX		(2U)
+
+/*
+ * Configuration structure for usart peripheral
+ */
+typedef struct {
+	uint8_t m_u8mode; /*!< possible values from  @usart_mode >*/
+	uint32_t m_u32baud; /*!< possible values from  @usart_baud >*/
+	uint8_t m_u8nomber_of_stop_bit; /*!< possible values from  @usart_numb_stop_bits >*/
+	uint8_t m_u8word_length; /*!< possible values from  @usart_word_length >*/
+	uint8_t m_u8parity_control; /*!< possible values from  @usart_parity >*/
+	uint8_t m_u8hw_flow_control; /*!< possible values from  @usart_hw_flow_ctrl >*/
+} usart_config_t;
+
+/*
+ * Handle structure for a GPIO pin
+ */
+typedef struct {
+	usart_reg_t *m_poi2c_reg; /*!< base address of the usart >*/
+	usart_config_t *m_pousart_config_t; /*!< usart configuration setting >*/
+	uint8_t *m_pu8tx_buffer; /*!<  To store the app tx buffer addr >*/
+	uint8_t *m_pu8rx_buffer; /*!<  To store the app rx buffer addr >*/
+	uint32_t m_u32tx_len; /*!<  To store the tx len >*/
+	uint32_t m_u32rx_len; /*!<  To store the rx len  >*/
+	uint8_t m_u8rx_tx_state; /*!<  To store the comm state see @tx_rx_state >*/
+	uint32_t m_u32rx_size; /*!<  To store the rx size >*/
+} usart_handle_t;
+
+/*!< Bit position definition of
+ * Guard time and prescaler register (USART_GTPR)
+ * >*/
+#define USART_GTPR_PSC	(0U)
+#define USART_GTPR_GT	(8U)
+
+/********************************************************************************************
+ *
+ * 								API supported by this driver
+ *
+ ********************************************************************************************/
+
+/*
+ * Perioheral Clock setup API
+ */
+/***************************************************************************************
+ * @fn					- usart_control_clock
+ *
+ * @brief				- Enables or disables peripheral clock for the given usart
+ *
+ * @param[in]			- Base address of the usart peripheral
+ * @param[in]			- ENABLE or DISABLE macro
+ *
+ * @return				- none
+ *
+ * @Note				- none
+ */
+void usart_control_clock(usart_reg_t *arg_ptr_usart,
+		uint8_t arg_u8enable_or_disable);
+
+/*
+ * Init and De init API
+ */
+/***************************************************************************************
+ * @fn					- usart_init
+ *
+ * @brief				- Initialise usart according to a given configuration
+ *
+ * @param[in]			- address of to a structure of the usart
+ *
+ * @return				- none
+ *
+ * @Note				- none
+ */
+void usart_init(usart_handle_t *arg_pousart_handler);
+
+
+/***************************************************************************************
+ * @fn					- usart_de_init
+ *
+ * @brief				- De-init a given usart
+ *
+ * @param[in]			- Base address of the usart peripheral
+ *
+ * @return				- none
+ *
+ * @Note				- none
+ */
+void usart_de_init(usart_reg_t *arg_pusart);
+
+/*
+ * Data Send and Receive API
+ */
+/***************************************************************************************
+ * @fn					- usart_send_data
+ *
+ * @brief				- Send data to a data register
+ *
+ * @param[in]			- Base address of the usart peripheral
+ * @param[in]			- Base address of the data to be sent
+ * @param[in]			- size of the data to be sent
+ *
+ * @return				- none
+ *
+ * @Note				- This is a blocking call
+ */
+void usart_send_data(usart_handle_t *arg_pusart_handle,
+		uint8_t *arg_ptr_u8tx_buffer, uint32_t arg_u32len);
+
+/***************************************************************************************
+ * @fn					- usart_receive_data
+ *
+ * @brief				- Receive data from a data register
+ *
+ * @param[in]			- Base address of the usart peripheral
+ * @param[in]			- Base address for the received data
+ * @param[in]			- size of the data to be received
+ *
+ * @return				- none
+ *
+ * @Note				- This is a blocking call
+ */
+void usart_receive_data(usart_reg_t *arg_pusart,
+		uint8_t *arg_pu8tx_buffer, uint32_t arg_u32len);
+
+/***************************************************************************************
+ * @fn					- usart_master_send_data_it
+ *
+ * @brief				- Send data to a data register
+ *
+ * @param[in]			- structure containing the usart and the information relate to the tranceiver
+ * @param[in]			- Base address of the data to be sent
+ * @param[in]			- size of the data to be sent
+ *
+ * @return				- application state see @appState
+ *
+ * @Note				- This is a non blocking call
+ */
+uint8_t usart_send_data_it(usart_handle_t *arg_pusart_handle,
+		uint8_t *arg_pu8tx_buffer, uint32_t arg_u32len);
+
+/***************************************************************************************
+ * @fn					- usart_master_receive_data_it
+ *
+ * @brief				- Receive data from a data register
+ *
+ * @param[in]			- structure containing the usart and the information relate to the tranceiver
+ * @param[in]			- Base address for the received data
+ * @param[in]			- size of the data to be received
+ *
+ * @return				- application state see @appState
+ *
+ * @Note				- This is a non blocking call
+ */
+uint8_t usart_receive_data_it(usart_handle_t *arg_pusart_handle,
+		uint8_t *arg_pu8rx_buffer, uint32_t arg_u32len);
+
+
+/*
+ * IRQ and ISR hadling
+ */
+/***************************************************************************************
+ * @fn					- usart_irq_config
+ *
+ * @brief				- Configure the irq handling of a given irq number
+ *
+ * @param[in]			- given irq number
+ * @param[in]			- given priority of the irq
+ * @param[in]			- ENABLE or DISABLE macro
+ *
+ * @return				- none
+ *
+ * @Note				- none
+ */
+void usart_irq_config(uint8_t arg_irq_number, uint8_t arg_irq_priority,
+		uint8_t arg_enable_or_disable);
+
+void usart_irq_handler(usart_handle_t *arg_pousart_handler);
+
+/*
+ * Other periheral control API
+ */
+/***************************************************************************************
+ * @fn					- usart_control_peripheral
+ *
+ * @brief				- Enable or disable the given usart
+ *
+ * @param[in]			- Base address of the usart peripheral
+ *
+ * @param[in]			- ENABLE or DISABLE macro
+ *
+ * @return				- none
+ *
+ * @Note				- none
+ */
+void usart_control_peripheral(usart_reg_t *arg_ptr_usart, uint8_t arg_enable_or_disable);
+
+/***************************************************************************************
+ * @fn					- usart_get_flag_status
+ *
+ * @brief				- get a given flag status of a given usart peripheral status register bit
+ *
+ * @param[in]			- Base address of the usart peripheral
+ * @param[in]			- usart peripheral status register bit
+ *
+ * @return				- FLAG_SET or FLAG_RESET
+ *
+ * @Note				- none
+ */
+uint8_t usart_get_flag_status(usart_reg_t *arg_ptr_usart, uint32_t arg_u8flag);
+
+/***************************************************************************************
+ * @fn					- usart_clear_flag_status
+ *
+ * @brief				- clear a given flag status of a given usart peripheral
+ *
+ * @param[in]			- Base address of the usart peripheral
+ * @param[in]			- usart peripheral status register bit
+ *
+ * @return				- FLAG_SET or FLAG_RESET
+ *
+ * @Note				- none
+ */
+void usart_clear_flag_status(usart_reg_t *arg_ptr_usart, uint32_t arg_u8flag);
+
+/*
+ * usart application Callback API
+ */
+void usart_app_callback(usart_handle_t *arg_pousart_handler, uint8_t arg_u8evt);
+
+/*
+ * Other periheral control API
+ */
+#endif /* INC_STM32F407XX_USART_DRIVER_H_ */

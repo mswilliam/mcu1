@@ -74,7 +74,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc"/>
-						<entry excluding="009_i2c_master_rx_testingIT.c|008_i2c_master_rx_testing.c|007_i2c_master_tx_testing.c|006_spi_cmd_handling.c|005_spi_txonly_arduino.c|004_spi_testing.c|003_button_interrupt_toggle_led.c|001_toogle_led.c|002_button_toggle_led.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
+						<entry excluding="010_i2c_slave_tx_testing.c|009_i2c_master_rx_testingIT.c|008_i2c_master_rx_testing.c|007_i2c_master_tx_testing.c|006_spi_cmd_handling.c|005_spi_txonly_arduino.c|004_spi_testing.c|003_button_interrupt_toggle_led.c|001_toogle_led.c|002_button_toggle_led.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Startup"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="drivers"/>
 					</sourceEntries>
@@ -153,7 +153,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc"/>
-						<entry excluding="009_i2c_master_rx_testingIT.c|008_i2c_master_rx_testing.c|007_i2c_master_tx_testing.c|006_spi_cmd_handling.c|005_spi_txonly_arduino.c|004_spi_testing.c|003_button_interrupt_toggle_led.c|001_toogle_led.c|002_button_toggle_led.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
+						<entry excluding="010_i2c_slave_tx_testing.c|009_i2c_master_rx_testingIT.c|008_i2c_master_rx_testing.c|007_i2c_master_tx_testing.c|006_spi_cmd_handling.c|005_spi_txonly_arduino.c|004_spi_testing.c|003_button_interrupt_toggle_led.c|001_toogle_led.c|002_button_toggle_led.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Startup"/>
 					</sourceEntries>
 				</configuration>

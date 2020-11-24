@@ -532,7 +532,9 @@ typedef struct {
 	volatile uint32_t SR; /* Status register Address offset: 0x00 Reset value: 0x0000 00C0 */
 	volatile uint32_t DR; /* Data register Address offset: 0x04 Reset value: 0xXXXX XXXX */
 	volatile uint32_t BRR; /* Baud rate register Note: The baud counters stop counting if the TE or RE bits are disabled respectively. Address offset: 0x08 Reset value: 0x0000 0000 */
-	volatile uint32_t CR[3]; /* Control register Address offset: 0x0C Reset value: 0x0000 0000 */
+	volatile uint32_t CR1; /* Control register Address offset: 0x0C Reset value: 0x0000 0000 */
+	volatile uint32_t CR2; /* Control register Address offset: 0x0C Reset value: 0x0000 0000 */
+	volatile uint32_t CR3; /* Control register Address offset: 0x0C Reset value: 0x0000 0000 */
 	volatile uint32_t GTPR; /* Guard time and prescaler register Address offset: 0x18 Reset value: 0x0000 0000 */
 } usart_reg_t;
 
@@ -541,7 +543,7 @@ typedef struct {
 #define USART2 ((usart_reg_t *) USART2_BASE_ADDR)
 #define USART3 ((usart_reg_t *) USART3_BASE_ADDR)
 #define UART4  ((usart_reg_t *) UART4_BASE_ADDR )
-#define UART5  ((usart_reg_t *) USART1_BASE_ADDR)
+#define UART5  ((usart_reg_t *) UART5_BASE_ADDR)
 #define USART6 ((usart_reg_t *) USART6_BASE_ADDR)
 #define UART7  ((usart_reg_t *) UART7_BASE_ADDR )
 #define UART8  ((usart_reg_t *) UART8_BASE_ADDR )
@@ -608,8 +610,8 @@ typedef struct {
 #define WWDG_RST()  do {(RCC -> APB1RSTR |= (SET << 0x0BU)); (RCC -> APB1RSTR &= ~(SET << 0x0BU));} while (0)
 #define SPI2_RST()  do {(RCC -> APB1RSTR |= (SET << 0x0EU)); (RCC -> APB1RSTR &= ~(SET << 0x0EU));} while (0)
 #define SPI3_RST()  do {(RCC -> APB1RSTR |= (SET << 0x0FU)); (RCC -> APB1RSTR &= ~(SET << 0x0FU));} while (0)
-#define UART2_RST() do {(RCC -> APB1RSTR |= (SET << 0x11U)); (RCC -> APB1RSTR &= ~(SET << 0x10U));} while (0)
-#define UART3_RST() do {(RCC -> APB1RSTR |= (SET << 0x12U)); (RCC -> APB1RSTR &= ~(SET << 0x11U));} while (0)
+#define USART2_RST() do {(RCC -> APB1RSTR |= (SET << 0x11U)); (RCC -> APB1RSTR &= ~(SET << 0x10U));} while (0)
+#define USART3_RST() do {(RCC -> APB1RSTR |= (SET << 0x12U)); (RCC -> APB1RSTR &= ~(SET << 0x11U));} while (0)
 #define UART4_RST() do {(RCC -> APB1RSTR |= (SET << 0x13U)); (RCC -> APB1RSTR &= ~(SET << 0x12U));} while (0)
 #define UART5_RST() do {(RCC -> APB1RSTR |= (SET << 0x14U)); (RCC -> APB1RSTR &= ~(SET << 0x13U));} while (0)
 #define I2C1_RST()  do {(RCC -> APB1RSTR |= (SET << 0x15U)); (RCC -> APB1RSTR &= ~(SET << 0x14U));} while (0)
@@ -672,5 +674,7 @@ typedef struct {
 #include "stm32f407xx_gpio_driver.h"
 #include "stm32f407xx_spi_driver.h"
 #include "stm32f407xx_i2c_driver.h"
+#include "stm32f407xx_usart_driver.h"
+#include "stm32f407xx_rcc_driver.h"
 
 #endif /* INC_STM32F407XX_H_ */
